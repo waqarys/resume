@@ -1,0 +1,111 @@
+% Waqar Shaikh — resume
+% Compile with MiKTeX: pdflatex waqar_shaikh_resume.tex
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[margin=0.62in,top=0.48in,bottom=0.48in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{ink}{HTML}{1C2834}
+\definecolor{rule}{HTML}{1F4E5F}
+\definecolor{muted}{HTML}{5C6B73}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\color{ink}
+\urlstyle{same}
+
+\newcommand{\role}[4]{%
+  \vspace{6pt}%
+  {\bfseries #1}\hfill{\bfseries #2}\\[-1pt]%
+  {\itshape #3}\hfill{\color{muted}#4}\par\vspace{1pt}%
+}
+\titleformat{\section}{\large\bfseries\color{rule}}{}{0pt}{}[\vspace{-6pt}{\color{rule}\titlerule}\vspace{1pt}]
+\titlespacing*{\section}{0pt}{8pt}{3pt}
+\setlist[itemize]{leftmargin=1.05em,itemsep=1.2pt,topsep=1.5pt,parsep=0pt}
+
+\begin{document}
+
+{\fontsize{20}{22}\selectfont\bfseries Waqar Shaikh}\\[2pt]
+{\color{rule}\bfseries Principal Engineer \textbar\ Java and Scala backend \textbar\ AI \textbar\ Fintech}\\[3pt]
+{\small
++91 9167453953
+\quad\textbar\quad
+\href{mailto:waqaryshaikh@gmail.com}{waqaryshaikh@gmail.com}
+\quad\textbar\quad
+Mumbai\\[1pt]
+\href{https://www.linkedin.com/in/shaikhwaqar/}{linkedin.com/in/shaikhwaqar}
+\quad\textbar\quad
+\href{https://github.com/waqarys}{github.com/waqarys}
+\quad\textbar\quad
+\href{https://waqarshaikh.lovable.app/}{waqarshaikh.lovable.app}
+\quad\textbar\quad
+\href{https://ziyarat.co.in}{ziyarat.co.in}
+}
+
+\vspace{3pt}
+{\color{rule}\hrule}
+
+\section{About}
+Principal engineer with 15 years building Java and Scala services, and AI-native applications, for fintech. Recent work applies OCR, retrieval, and LLM steps to KYC data quality and decision support inside an existing bank platform, with a human still making the decision. Open to a principal backend role and an applied-AI role in a GCC.
+
+\section{Selected work}
+\begin{itemize}
+  \item \textbf{Ziyarat} \href{https://ziyarat.co.in}{ziyarat.co.in} --- Hajj and Umrah package comparison. Visitors compare price per day, hotel stars, and distance from the Haram. Operators can be added; listings are partial, not a full live catalogue yet.
+\end{itemize}
+
+\section{Experience}
+
+\role{Nomura}{Oct 2024 -- Present}{Principal Engineer}{Mumbai}
+\begin{itemize}
+  \item Apply OCR inside the existing KYC workflow so reviewers work from extracted fields rather than raw document packs.
+  \item Use LLM and retrieval over policy and KYC text for decision support. The model does not accept or reject a case.
+  \item Build data-quality tooling that flags gaps before a case moves.
+\end{itemize}
+
+\role{BNP Paribas}{May 2022 -- Oct 2024}{Project Manager and technical lead}{Mumbai}
+\begin{itemize}
+  \item Led delivery and the technical design of the platform serving Markets360, Credit 360, Market Calendar, Forecast, Quant, and Sustainability research over email, SFTP, REST, and Symphony.
+  \item Upgraded Java and split monolithic services into a microservices architecture. Owned the design issues that blocked the split.
+  \item Shortened the release path with Jenkins and Ansible, grew the team through hiring and technical interviews, and ran releases and stakeholder coordination.
+\end{itemize}
+
+\role{Bank of America}{Apr 2018 -- May 2022}{Senior Software Engineer, Equity Swaps}{Mumbai}
+\begin{itemize}
+  \item Delivered Scala and Java backend features on the Equity Swaps platform in Global Equity Markets, in an event-driven, high-concurrency environment.
+  \item Senior developer and lead from 2020: design reviews, delivery with the desk, and executable software.
+\end{itemize}
+
+\role{Earlier}{2013 -- 2018}{Cognizant, Capgemini, L\&T Infotech, Mastek}{Mumbai}
+\begin{itemize}
+  \item Cognizant: client workflows to create, open, close, restrict, and classify accounts by risk profile.
+  \item Capgemini: R\&D, responsive UI redesign, and feature work.
+  \item L\&T Infotech: centralised package dimensions across North American units for multiple vendors.
+  \item Mastek: linked technical parts data to real-world parts costs. Agile L1, Fire in the Belly, Spot Recognition (2014).
+\end{itemize}
+
+\section{Skills}
+\textbf{Backend:} Scala, Cats, Akka, fs2, Akka HTTP, Circe, Java 8 and 24, Spring Boot, Hibernate, multithreading\\
+\textbf{Data and integration:} Oracle, MySQL, PostgreSQL, Kafka, Elasticsearch, AMPS, MQ, Flyway, Liquibase\\
+\textbf{Delivery:} Jenkins, Ansible, Docker, Grafana, Splunk, Bitbucket, APIGEE, Testcontainers\\
+\textbf{Applied AI:} OCR, NLP, retrieval, and LLM workflows inside fintech platforms\\
+\textbf{Also:} TypeScript, Angular, JUnit, Mockito, ScalaTest, ScalaCheck
+
+\section{Education}
+\textbf{University of Texas at Austin, McCombs School of Business} \hfill 2024 -- 2025\\
+Post Graduate Program in Artificial Intelligence and Machine Learning\\[2pt]
+\textbf{Saboo Siddik College of Engineering, Mumbai} \hfill 2008 -- 2012\\
+B.E.\ Electronics and Telecommunications \quad University topper, 2012\\[2pt]
+\textbf{Bombay Stock Exchange Institute} \hfill 2014 -- 2015\\
+Executive Programme in Investment Management / Finance (EPIM)
+
+\section{Certifications and awards}
+Scala Language, Akka for Scala, Akka Streams, Akka Cluster Fundamentals, Akka Cluster Sharding --- Lightbend, Professional Level 2.\\
+Silver Award, Bank of America (2018). Star Award, Cognizant (2017).
+
+\end{document}
