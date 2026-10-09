@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume editor — Waqar Shaikh</title>
+<style>
+  :root { --ink:#1c2834; --rule:#1f4e5f; --paper:#f4f1ea; --line:#e4ddd2; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, "Times New Roman", serif; background:#1c2834; color:#f4f1ea; }
+  header { padding:14px 18px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; font-weight:600; font-family: Calibri, Arial, sans-serif; }
+  button { font-family: Calibri, Arial, sans-serif; background:#0f6e6b; color:#fff; border:0; border-radius:6px; padding:8px 12px; cursor:pointer; }
+  button.ghost { background:transparent; color:#f4f1ea; border:1px solid #5c6b73; }
+  main { display:grid; grid-template-columns: 380px 1fr; gap:0; min-height: calc(100vh - 54px); }
+  aside { padding:12px 14px 28px; overflow:auto; max-height: calc(100vh - 54px); font-family: Calibri, Arial, sans-serif; }
+  label { display:block; font-size:12px; letter-spacing:.04em; text-transform:uppercase; margin:12px 0 4px; color:#c4a35a; }
+  input, textarea { width:100%; background:#122028; color:#f4f1ea; border:1px solid #34505c; border-radius:6px; padding:8px; font: 14px/1.4 Calibri, Arial, sans-serif; }
+  textarea { min-height: 72px; resize: vertical; }
+  textarea#experience { min-height: 320px; }
+  textarea#about, textarea#skills { min-height: 160px; }
+  .preview-wrap { background:#d9d3c7; overflow:auto; padding:18px; }
+
+  /* A4 preview. Single column, normal text flow only (no flex/grid inside the page) so PDF text extracts in reading order. */
+  #paper { width: 210mm; min-height: 297mm; margin: 0 auto; background:#fff; color:var(--ink);
+           padding: 9mm 13mm 7mm; box-shadow: 0 8px 28px rgba(0,0,0,.25);
+           font-family: "TeX Gyre Termes", "Times New Roman", "Liberation Serif", Tinos, Times, serif;
+           font-size: 9.4pt; line-height: 1.14; }
+  #paper a { color: inherit; text-decoration: none; }
+  #paper h2 { font-size: 20pt; line-height: 1.1; margin: 0 0 1pt; }
+  #paper .tag { color: var(--rule); font-weight: 700; margin: 0; }
+  #paper .contact { margin: 0; }
+  #paper h3 { color: var(--rule); font-size: 11.5pt; border-bottom: 0.6pt solid var(--rule); margin: 4pt 0 1.5pt; padding-bottom: 0; }
+  #paper p { margin: 0; }
+  #paper .role { font-weight: 700; margin: 2.6pt 0 0; }
+  #paper ul { margin: 0.5pt 0 0; padding-left: 1.0em; list-style: none; }
+  #paper li { margin: 0; text-indent: -0.7em; padding-left: 0; }
+  #paper li::before { content: "\2022  "; }   /* real U+2022 bullet character in the text layer */
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background:#fff; }
+    header, aside { display:none !important; }
+    main { display:block; }
+    .preview-wrap { background:#fff; padding:0; overflow:visible; }
+    #paper { box-shadow:none; margin:0; min-height:0; }
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    aside { max-height: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Resume editor</h1>
+  <button onclick="renderPdf()">Render PDF</button>
+  <button class="ghost" onclick="downloadTex()">Download LaTeX</button>
+  <button class="ghost" onclick="resetData()">Reset</button>
+</header>
+<main>
+  <aside id="form"></aside>
+  <div class="preview-wrap"><article id="paper"></article></div>
+</main>
+<script>
+const STORE_KEY = "waqar-resume-v2";   // bumped from "waqar-resume" so old saved edits don't override the v2 defaults
+const FIELDS = [
+  ["name", "Name", "text"],
+  ["headline", "Headline", "text"],
+  ["phone", "Phone (becomes a tel: link)", "text"],
+  ["email", "Email (becomes a mailto: link)", "text"],
+  ["city", "City", "text"],
+  ["links", "Links, one per line as Label | URL", "area"],
+  ["about", "Summary", "area"],
+  ["experience", "Experience. Role line: Company | Title | City | Dates. Bullets follow, prefixed with - . Blank line between roles", "area"],
+  ["skills", "Skills, one line per group as Label: text (a second 'Label:' after a full stop is also bolded)", "area"],
+  ["selected", "Projects, one per line as Name | URL | Description", "area"],
+  ["education", "Education, one per line as Qualification, School | Years", "area"],
+  ["certs", "Certifications and Awards, one paragraph per line", "area"]
+];
+const DEFAULTS = {
+  name: "Waqar Shaikh",
+  headline: "Principal Engineer | Java, Scala and Python Backend | Microservices | Applied AI | Fintech",
+  phone: "+91 9167453953",
+  email: "waqaryshaikh@gmail.com",
+  city: "Mumbai, India",
+  links: "linkedin.com/in/shaikhwaqar | https://www.linkedin.com/in/shaikhwaqar\ngithub.com/waqarys | https://github.com/waqarys\nwaqarshaikh.lovable.app | https://waqarshaikh.lovable.app/\nziyarat.co.in | https://ziyarat.co.in",
+  about: "Principal engineer with 15 years building scalable, high-performance distributed systems in Java and Scala, predominantly in fintech, and AI-native applications in Python. Hands-on with system design, microservice and event-driven architecture, Kafka messaging, multithreading and concurrency (virtual threads in Java, fibers in Scala), and functional, declarative programming in both languages. Runs Java version upgrades with Moderne and OpenRewrite, builds metrics, monitoring, and observability with Grafana and Splunk, and uses Claude Code for AI-assisted development and code review, including skills, plugins, and MCP servers built for the firm. Recent work applies OCR, retrieval, and LLM steps to KYC data quality and decision support, with a human still making the decision. Open to principal backend and applied-AI roles in Europe, relocating from Mumbai.",
+  experience: [
+    "Nomura | Principal Engineer | Mumbai | Oct 2024 – Present",
+    "- Lead backend engineering (Java, Scala, Python) for Onboarding/Offboarding and Reference Data systems, focused on production-grade data quality, reliability, and automation.",
+    "- Apply OCR inside the existing KYC workflow so reviewers work from extracted fields rather than raw document packs, considerably reducing review and screening time.",
+    "- Use LLM and retrieval (RAG with document chunking) over policy and KYC text for decision support in a Python application. The model does not accept or reject a case.",
+    "- Automated the population of client risk forms, reducing manual effort, and migrated databases from Sybase to MS SQL Server.",
+    "- Build data-quality tooling that flags gaps before a case moves.",
+    "- Built an offboarding engine that mines client data monthly, identifies clients below value thresholds across multiple metrics, flags them for a 21-day review cycle, and then triggers the formal offboarding chain.",
+    "- Worked on the settlement system that links captured client trades to each counterparty's pre-configured settlement chain.",
+    "- Built Claude Code skills and plugins that automate cross-environment property comparison and generate release instructions, and developed MCP (Model Context Protocol) servers connecting Confluence and Jira to Claude Code.",
+    "",
+    "BNP Paribas | Project Manager and Technical Lead | Mumbai | May 2022 – Oct 2024",
+    "- Led the system design, architecture, and delivery of a distributed research distribution platform (Markets360, Credit 360, Market Calendar, Forecast, Quant, Sustainability) over email, SFTP, OAuth2-secured REST APIs, and Symphony, with database partitioning.",
+    "- Upgraded Java and refactored legacy screens and monoliths into a microservice architecture shared by the browser and mobile apps, resolving the design issues that blocked the split.",
+    "- Added Firebase push notifications to the mobile app and built CI/CD pipelines with Jenkins and Ansible to shorten releases.",
+    "- Grew and managed the team: hiring, technical interviews, mentoring, code review, releases, and stakeholder communication.",
+    "",
+    "Bank of America | Senior Software Engineer, Equity Swaps | Mumbai | Apr 2018 – May 2022",
+    "- Delivered Scala and Java backend features on the Equity Swaps trading platform in Global Equity Markets, in an event-driven, high-concurrency, high-throughput environment (multithreading, performance tuning), with application sharding on Akka Cluster Sharding and OAuth2-secured services.",
+    "- Senior developer and lead from 2020: design reviews, code review, and delivering executable software with the business.",
+    "",
+    "Earlier roles | Mumbai | 2013 – 2018",
+    "- Cognizant, Associate (2016–2018): client onboarding workflows to open, close, restrict, and classify accounts by risk profile.",
+    "- Capgemini, Senior Software Engineer (2015–2016): R&D, responsive UI redesign, and Point of Sale feature work.",
+    "- L&T Infotech, Senior Software Engineer (2015): centralised package dimensions across North American units and vendors.",
+    "- Mastek, Software Engineer (2013–2015): linked technical parts data to real-world parts costs for a car insurance application."
+  ].join("\n"),
+  skills: [
+    "Languages: Java (8, 24), Scala, Python, SQL, TypeScript; functional, declarative, and object-oriented programming",
+    "Backend: Spring Boot, Hibernate, Akka, Akka HTTP, Cats, fs2, Circe, Play; multithreading, virtual threads, fibers, performance tuning",
+    "Architecture: system design, microservices, event-driven architectures, sharding, partitioning, resilient high-throughput services",
+    "Data and messaging: Oracle, MySQL, PostgreSQL, MS SQL Server, Sybase, Elasticsearch, Flyway, Liquibase; messaging systems: Kafka, AMPS, MQ",
+    "Observability: Grafana, Splunk; metrics, monitoring, and observability. Security: OAuth2",
+    "CI/CD: Git (Bitbucket, GitHub), Jenkins, Ansible, Docker, APIGEE, Testcontainers. Java version upgrades: Moderne, OpenRewrite",
+    "Testing, frontend, mobile: JUnit, Mockito, ScalaTest, ScalaCheck; Angular; Firebase push notifications",
+    "Applied AI: Python, OCR, NLP, RAG, LLMs; Claude Code (AI-assisted development, code review, skills, plugins); MCP servers",
+    "Ways of working: Agile, Scrum, code review, mentoring, technical interviews, stakeholder communication, problem solving"
+  ].join("\n"),
+  selected: "Ziyarat | https://ziyarat.co.in | Hajj and Umrah package comparison by price per day, hotel stars, and distance from the Haram (partial listings).",
+  education: [
+    "Post Graduate Program in Artificial Intelligence and Machine Learning, University of Texas at Austin (McCombs) | 2024 – 2025",
+    "B.E. Electronics and Telecommunications, Saboo Siddik College of Engineering (University topper, 2012) | 2008 – 2012",
+    "Executive Programme in Investment Management / Finance (EPIM), Bombay Stock Exchange Institute | 2014 – 2015"
+  ].join("\n"),
+  certs: "Lightbend Professional Level 2: Scala Language, Akka for Scala, Akka Streams, Akka Cluster Fundamentals, Akka Cluster Sharding. Silver Award, Bank of America (2018); Star Award, Cognizant (2017); Agile L1, Fire in the Belly, Spot Recognition, Mastek (2014)."
+};
+
+/* ---------- parsing (shared by the HTML preview and the LaTeX export) ---------- */
+const lines = s => (s || "").split("\n").map(l => l.trim()).filter(Boolean);
+const pipes = s => s.split("|").map(x => x.trim());
+function parse(d) {
+  return {
+    name: d.name, headline: d.headline, phone: d.phone, email: d.email, city: d.city,
+    links: lines(d.links).map(l => { const [label, url] = pipes(l); return { label: label || url, url: url || "" }; }),
+    summary: (d.about || "").trim(),
+    roles: (d.experience || "").split(/\n\s*\n/).map(block => {
+      const ls = lines(block);
+      if (!ls.length) return null;
+      return { head: pipes(ls[0]).filter(Boolean).join(" | "), bullets: ls.slice(1).map(l => l.replace(/^[-•*]\s*/, "")) };
+    }).filter(Boolean),
+    // a skills line may hold several "Label: text" groups separated by ". " (e.g. "... observability. Security: OAuth2")
+    skills: lines(d.skills).map(l => l.split(/(?<=\.)\s+(?=[A-Z][A-Za-z ,/]{0,30}: )/).map(seg => {
+      const m = seg.match(/^([A-Z][A-Za-z ,/]{0,30}):\s*(.*)$/);
+      return m ? { label: m[1], text: m[2] } : { label: "", text: seg };
+    })),
+    projects: lines(d.selected).map(l => { const p = pipes(l); return p.length >= 3 ? { name: p[0], url: p[1], desc: p.slice(2).join(" | ") } : { name: "", url: "", desc: l }; }),
+    education: lines(d.education),
+    certs: lines(d.certs)
+  };
+}
+const display = url => url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+const telHref = p => "tel:" + (p || "").replace(/[^\d+]/g, "");
+
+/* ---------- HTML preview ---------- */
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function load() {
+  try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(STORE_KEY) || "{}")); }
+  catch (e) { return Object.assign({}, DEFAULTS); }
+}
+function save(data) { try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {} }
+function read() {
+  const data = {};
+  for (const [id] of FIELDS) data[id] = document.getElementById(id).value;
+  return data;
+}
+function paint(data) {
+  const r = parse(data);
+  const a = (href, text) => href ? `<a href="${esc(href)}">${esc(text)}</a>` : esc(text);
+  const contact = [r.phone && a(telHref(r.phone), r.phone), r.email && a("mailto:" + r.email, r.email), r.city && esc(r.city)].filter(Boolean).join(" | ");
+  const links = r.links.map(l => a(l.url, l.label)).join(" | ");
+  const exp = r.roles.map(role => `<p class="role">${esc(role.head)}</p><ul>${role.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>`).join("");
+  const skills = r.skills.map(segs => `<p>${segs.map(s => (s.label ? `<b>${esc(s.label)}:</b> ` : "") + esc(s.text)).join(" ")}</p>`).join("");
+  const projects = r.projects.map(p => `<p>${p.name ? `<b>${esc(p.name)}</b> (${a(p.url, display(p.url))}): ` : ""}${esc(p.desc)}</p>`).join("");
+  document.getElementById("paper").innerHTML = `
+    <h2>${esc(r.name)}</h2>
+    <p class="tag">${esc(r.headline)}</p>
+    <p class="contact">${contact}</p>
+    <p class="contact">${links}</p>
+    <h3>Summary</h3><p>${esc(r.summary)}</p>
+    <h3>Experience</h3>${exp}
+    <h3>Skills</h3>${skills}
+    <h3>Projects</h3>${projects}
+    <h3>Education</h3>${r.education.map(l => `<p>${esc(l)}</p>`).join("")}
+    <h3>Certifications and Awards</h3>${r.certs.map(l => `<p>${esc(l)}</p>`).join("")}`;
+}
+
+/* ---------- LaTeX export (same layout as waqar_shaikh_resume.tex) ---------- */
+function texEsc(s) {
+  return String(s ?? "")
+    .replace(/\\/g, "\u0000")
+    .replace(/([&%$#_{}])/g, "\\$1")
+    .replace(/~/g, "\\textasciitilde{}")
+    .replace(/\^/g, "\\textasciicircum{}")
+    .replace(/\u0000/g, "\\textbackslash{}")
+    .replace(/—/g, "---").replace(/–/g, "--")
+    .replace(/[‘’]/g, "'").replace(/“/g, "``").replace(/”/g, "''")
+    .replace(/\u00a0/g, "~");
+}
+const texUrl = u => String(u).replace(/([%#\\])/g, "\\$1");
+function buildTex(data) {
+  const r = parse(data);
+  const href = (u, t) => u ? `\\href{${texUrl(u)}}{${texEsc(t)}}` : texEsc(t);
+  const contact = [r.phone && href(telHref(r.phone), r.phone), r.email && href("mailto:" + r.email, r.email), r.city && texEsc(r.city)].filter(Boolean).join(" | ");
+  const links = r.links.map(l => href(l.url, l.label)).join(" | ");
+  const roles = r.roles.map(role =>
+    `\\role{${texEsc(role.head)}}\n` + (role.bullets.length ? `\\begin{itemize}\n${role.bullets.map(b => `  \\item ${texEsc(b)}`).join("\n")}\n\\end{itemize}` : "")).join("\n");
+  const skills = r.skills.map(segs => segs.map(s => (s.label ? `\\textbf{${texEsc(s.label)}:} ` : "") + texEsc(s.text)).join(" ") + "\\par").join("\n");
+  const projects = r.projects.map(p => (p.name ? `\\textbf{${texEsc(p.name)}} (${href(p.url, display(p.url))}): ` : "") + texEsc(p.desc) + "\\par").join("\n");
+  return `% ${texEsc(r.name)} — resume (generated by the resume editor, index.html)
+% Single column, real bullets, Unicode text layer (glyphtounicode) so ATS parsers extract it cleanly.
+% Compile with MiKTeX or TeX Live: pdflatex waqar_shaikh_resume.tex
+\\documentclass[10pt,a4paper]{article}
+
+\\input{glyphtounicode}
+\\pdfgentounicode=1
+\\pdfinterwordspaceon % emit real space characters so every extractor (incl. pdfplumber) sees word gaps
+
+\\usepackage[left=1.45cm,right=1.45cm,top=1.0cm,bottom=0.9cm]{geometry}
+\\usepackage[T1]{fontenc}
+\\usepackage[utf8]{inputenc}
+\\usepackage{tgtermes}          % Times-like (TeX Gyre Termes)
+\\usepackage[protrusion=true,expansion=false]{microtype}
+\\usepackage{xcolor}
+\\usepackage{enumitem}
+\\usepackage{titlesec}
+\\usepackage[hidelinks]{hyperref}
+\\hypersetup{pdftitle={${texEsc(r.name)} - Resume}, pdfauthor={${texEsc(r.name)}},
+  pdfsubject={${texEsc(r.headline)}}}
+
+\\definecolor{acc}{HTML}{1F4E5F}
+\\pagestyle{empty}
+\\setlength{\\parindent}{0pt}
+\\setlength{\\parskip}{0pt}
+\\urlstyle{same}
+\\renewcommand{\\baselinestretch}{1.0}
+\\hyphenpenalty=10000 \\exhyphenpenalty=10000 % never split words (clean ATS extraction)
+\\newcommand{\\fs}{9.5}\\newcommand{\\ld}{11.0}
+
+% Role line: everything (dates included) in one text run so ATS parsers keep reading order
+\\newcommand{\\role}[1]{\\par\\vspace{2.6pt}{\\bfseries #1}\\par}
+\\titleformat{\\section}{\\fontsize{11.5}{12}\\selectfont\\bfseries\\color{acc}}{}{0pt}{}[\\vspace{-8pt}{\\color{acc}\\rule{\\linewidth}{0.6pt}}]
+\\titlespacing*{\\section}{0pt}{5pt}{1.5pt}
+\\setlist[itemize]{label=\\textbullet,leftmargin=1.0em,labelsep=0.35em,itemsep=0pt,topsep=0.5pt,parsep=0pt,partopsep=0pt}
+
+\\begin{document}
+\\raggedright\\fontsize{\\fs}{\\ld}\\selectfont
+
+{\\fontsize{20}{23}\\selectfont\\bfseries ${texEsc(r.name)}}\\par\\vspace{1pt}
+{\\color{acc}\\bfseries ${texEsc(r.headline)}}\\par
+${contact}\\par
+${links}\\par
+
+\\section*{Summary}
+${texEsc(r.summary)}
+
+\\section*{Experience}
+${roles}
+
+\\section*{Skills}
+${skills}
+
+\\section*{Projects}
+${projects}
+
+\\section*{Education}
+${r.education.map(l => texEsc(l) + "\\par").join("\n")}
+
+\\section*{Certifications and Awards}
+${r.certs.map(texEsc).join("\n\n")}
+
+\\end{document}
+`;
+}
+
+/* ---------- UI ---------- */
+function bind() {
+  const data = load();
+  document.getElementById("form").innerHTML = FIELDS.map(([id, label, kind]) =>
+    `<label for="${id}">${esc(label)}</label>` + (kind === "area"
+      ? `<textarea id="${id}"></textarea>`
+      : `<input id="${id}" type="text">`)
+  ).join("");
+  for (const [id] of FIELDS) {
+    document.getElementById(id).value = data[id] || "";
+    document.getElementById(id).addEventListener("input", () => {
+      const next = read();
+      save(next);
+      paint(next);
+    });
+  }
+  paint(data);
+}
+function renderPdf() { window.print(); }
+function downloadTex() {
+  const blob = new Blob([buildTex(read())], { type: "text/x-tex;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "waqar_shaikh_resume.tex";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function resetData() {
+  localStorage.removeItem(STORE_KEY);
+  bind();
+}
+bind();
+</script>
+</body>
+</html>
