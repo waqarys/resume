@@ -1,111 +1,103 @@
-% Waqar Shaikh — resume
-% Compile with MiKTeX: pdflatex waqar_shaikh_resume.tex
+% Waqar Shaikh — resume (ATS version, Europe)
+% Single column, real bullets, Unicode text layer (glyphtounicode) so ATS parsers extract it cleanly.
+% Compile with MiKTeX or TeX Live: pdflatex waqar_shaikh_resume.tex
 \documentclass[10pt,a4paper]{article}
 
-\usepackage[margin=0.62in,top=0.48in,bottom=0.48in]{geometry}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\pdfinterwordspaceon % emit real space characters so every extractor (incl. pdfplumber) sees word gaps
+
+\usepackage[left=1.45cm,right=1.45cm,top=1.0cm,bottom=0.9cm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{microtype}
+\usepackage[utf8]{inputenc}
+\usepackage{tgtermes}          % Times-like (TeX Gyre Termes)
+\usepackage[protrusion=true,expansion=false]{microtype}
 \usepackage{xcolor}
 \usepackage{enumitem}
-\usepackage[hidelinks]{hyperref}
 \usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Waqar Shaikh - Resume}, pdfauthor={Waqar Shaikh},
+  pdfsubject={Principal Engineer | Java, Scala, Python backend | Microservices | Applied AI | Fintech}}
 
-\definecolor{ink}{HTML}{1C2834}
-\definecolor{rule}{HTML}{1F4E5F}
-\definecolor{muted}{HTML}{5C6B73}
+\definecolor{acc}{HTML}{1F4E5F}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
-\color{ink}
 \urlstyle{same}
+\renewcommand{\baselinestretch}{1.0}
+\hyphenpenalty=10000 \exhyphenpenalty=10000 % never split words (clean ATS extraction)
+\newcommand{\fs}{9.5}\newcommand{\ld}{11.0}
 
-\newcommand{\role}[4]{%
-  \vspace{6pt}%
-  {\bfseries #1}\hfill{\bfseries #2}\\[-1pt]%
-  {\itshape #3}\hfill{\color{muted}#4}\par\vspace{1pt}%
-}
-\titleformat{\section}{\large\bfseries\color{rule}}{}{0pt}{}[\vspace{-6pt}{\color{rule}\titlerule}\vspace{1pt}]
-\titlespacing*{\section}{0pt}{8pt}{3pt}
-\setlist[itemize]{leftmargin=1.05em,itemsep=1.2pt,topsep=1.5pt,parsep=0pt}
+% Role line: everything (dates included) in one text run so ATS parsers keep reading order
+\newcommand{\role}[1]{\par\vspace{2.6pt}{\bfseries #1}\par}
+\titleformat{\section}{\fontsize{11.5}{12}\selectfont\bfseries\color{acc}}{}{0pt}{}[\vspace{-8pt}{\color{acc}\rule{\linewidth}{0.6pt}}]
+\titlespacing*{\section}{0pt}{5pt}{1.5pt}
+\setlist[itemize]{label=\textbullet,leftmargin=1.0em,labelsep=0.35em,itemsep=0pt,topsep=0.5pt,parsep=0pt,partopsep=0pt}
+\newcommand{\sk}[2]{\textbf{#1:} #2\par}
 
 \begin{document}
+\raggedright\fontsize{\fs}{\ld}\selectfont
 
-{\fontsize{20}{22}\selectfont\bfseries Waqar Shaikh}\\[2pt]
-{\color{rule}\bfseries Principal Engineer \textbar\ Java and Scala backend \textbar\ AI \textbar\ Fintech}\\[3pt]
-{\small
-+91 9167453953
-\quad\textbar\quad
-\href{mailto:waqaryshaikh@gmail.com}{waqaryshaikh@gmail.com}
-\quad\textbar\quad
-Mumbai\\[1pt]
-\href{https://www.linkedin.com/in/shaikhwaqar/}{linkedin.com/in/shaikhwaqar}
-\quad\textbar\quad
-\href{https://github.com/waqarys}{github.com/waqarys}
-\quad\textbar\quad
-\href{https://waqarshaikh.lovable.app/}{waqarshaikh.lovable.app}
-\quad\textbar\quad
-\href{https://ziyarat.co.in}{ziyarat.co.in}
-}
+{\fontsize{20}{23}\selectfont\bfseries Waqar Shaikh}\par\vspace{1pt}
+{\color{acc}\bfseries Principal Engineer | Java, Scala and Python Backend | Microservices | Applied AI | Fintech}\par
+\href{tel:+919167453953}{+91 9167453953} | \href{mailto:waqaryshaikh@gmail.com}{waqaryshaikh@gmail.com} | Mumbai, India\par
+\href{https://www.linkedin.com/in/shaikhwaqar}{linkedin.com/in/shaikhwaqar} | \href{https://github.com/waqarys}{github.com/waqarys} | \href{https://waqarshaikh.lovable.app/}{waqarshaikh.lovable.app} | \href{https://ziyarat.co.in}{ziyarat.co.in}\par
 
-\vspace{3pt}
-{\color{rule}\hrule}
+\section*{Summary}
+Principal engineer with 15 years building scalable, high-performance distributed systems in Java and Scala, predominantly in fintech, and AI-native applications in Python. Hands-on with system design, microservice and event-driven architecture, Kafka messaging, multithreading and concurrency (virtual threads in Java, fibers in Scala), and functional, declarative programming in both languages. Runs Java version upgrades with Moderne and OpenRewrite, builds metrics, monitoring, and observability with Grafana and Splunk, and uses Claude Code for AI-assisted development and code review, including skills, plugins, and MCP servers built for the firm. Recent work applies OCR, retrieval, and LLM steps to KYC data quality and decision support, with a human still making the decision. Open to principal backend and applied-AI roles in Europe, relocating from Mumbai.
 
-\section{About}
-Principal engineer with 15 years building Java and Scala services, and AI-native applications, for fintech. Recent work applies OCR, retrieval, and LLM steps to KYC data quality and decision support inside an existing bank platform, with a human still making the decision. Open to a principal backend role and an applied-AI role in a GCC.
-
-\section{Selected work}
+\section*{Experience}
+\role{Nomura | Principal Engineer | Mumbai | Oct 2024 -- Present}
 \begin{itemize}
-  \item \textbf{Ziyarat} \href{https://ziyarat.co.in}{ziyarat.co.in} --- Hajj and Umrah package comparison. Visitors compare price per day, hotel stars, and distance from the Haram. Operators can be added; listings are partial, not a full live catalogue yet.
-\end{itemize}
-
-\section{Experience}
-
-\role{Nomura}{Oct 2024 -- Present}{Principal Engineer}{Mumbai}
-\begin{itemize}
-  \item Apply OCR inside the existing KYC workflow so reviewers work from extracted fields rather than raw document packs.
-  \item Use LLM and retrieval over policy and KYC text for decision support. The model does not accept or reject a case.
+  \item Lead backend engineering (Java, Scala, Python) for Onboarding/Offboarding and Reference Data systems, focused on production-grade data quality, reliability, and automation.
+  \item Apply OCR inside the existing KYC workflow so reviewers work from extracted fields rather than raw document packs, considerably reducing review and screening time.
+  \item Use LLM and retrieval (RAG with document chunking) over policy and KYC text for decision support in a Python application. The model does not accept or reject a case.
+  \item Automated the population of client risk forms, reducing manual effort, and migrated databases from Sybase to MS SQL Server.
   \item Build data-quality tooling that flags gaps before a case moves.
+  \item Built an offboarding engine that mines client data monthly, identifies clients below value thresholds across multiple metrics, flags them for a 21-day review cycle, and then triggers the formal offboarding chain.
+  \item Worked on the settlement system that links captured client trades to each counterparty's pre-configured settlement chain.
+  \item Built Claude Code skills and plugins that automate cross-environment property comparison and generate release instructions, and developed MCP (Model Context Protocol) servers connecting Confluence and Jira to Claude Code.
 \end{itemize}
-
-\role{BNP Paribas}{May 2022 -- Oct 2024}{Project Manager and technical lead}{Mumbai}
+\role{BNP Paribas | Project Manager and Technical Lead | Mumbai | May 2022 -- Oct 2024}
 \begin{itemize}
-  \item Led delivery and the technical design of the platform serving Markets360, Credit 360, Market Calendar, Forecast, Quant, and Sustainability research over email, SFTP, REST, and Symphony.
-  \item Upgraded Java and split monolithic services into a microservices architecture. Owned the design issues that blocked the split.
-  \item Shortened the release path with Jenkins and Ansible, grew the team through hiring and technical interviews, and ran releases and stakeholder coordination.
+  \item Led the system design, architecture, and delivery of a distributed research distribution platform (Markets360, Credit 360, Market Calendar, Forecast, Quant, Sustainability) over email, SFTP, OAuth2-secured REST APIs, and Symphony, with database partitioning.
+  \item Upgraded Java and refactored legacy screens and monoliths into a microservice architecture shared by the browser and mobile apps, resolving the design issues that blocked the split.
+  \item Added Firebase push notifications to the mobile app and built CI/CD pipelines with Jenkins and Ansible to shorten releases.
+  \item Grew and managed the team: hiring, technical interviews, mentoring, code review, releases, and stakeholder communication.
 \end{itemize}
-
-\role{Bank of America}{Apr 2018 -- May 2022}{Senior Software Engineer, Equity Swaps}{Mumbai}
+\role{Bank of America | Senior Software Engineer, Equity Swaps | Mumbai | Apr 2018 -- May 2022}
 \begin{itemize}
-  \item Delivered Scala and Java backend features on the Equity Swaps platform in Global Equity Markets, in an event-driven, high-concurrency environment.
-  \item Senior developer and lead from 2020: design reviews, delivery with the desk, and executable software.
+  \item Delivered Scala and Java backend features on the Equity Swaps trading platform in Global Equity Markets, in an event-driven, high-concurrency, high-throughput environment (multithreading, performance tuning), with application sharding on Akka Cluster Sharding and OAuth2-secured services.
+  \item Senior developer and lead from 2020: design reviews, code review, and delivering executable software with the business.
 \end{itemize}
-
-\role{Earlier}{2013 -- 2018}{Cognizant, Capgemini, L\&T Infotech, Mastek}{Mumbai}
+\role{Earlier roles | Mumbai | 2013 -- 2018}
 \begin{itemize}
-  \item Cognizant: client workflows to create, open, close, restrict, and classify accounts by risk profile.
-  \item Capgemini: R\&D, responsive UI redesign, and feature work.
-  \item L\&T Infotech: centralised package dimensions across North American units for multiple vendors.
-  \item Mastek: linked technical parts data to real-world parts costs. Agile L1, Fire in the Belly, Spot Recognition (2014).
+  \item Cognizant, Associate (2016--2018): client onboarding workflows to open, close, restrict, and classify accounts by risk profile.
+  \item Capgemini, Senior Software Engineer (2015--2016): R\&D, responsive UI redesign, and Point of Sale feature work.
+  \item L\&T Infotech, Senior Software Engineer (2015): centralised package dimensions across North American units and vendors.
+  \item Mastek, Software Engineer (2013--2015): linked technical parts data to real-world parts costs for a car insurance application.
 \end{itemize}
 
-\section{Skills}
-\textbf{Backend:} Scala, Cats, Akka, fs2, Akka HTTP, Circe, Java 8 and 24, Spring Boot, Hibernate, multithreading\\
-\textbf{Data and integration:} Oracle, MySQL, PostgreSQL, Kafka, Elasticsearch, AMPS, MQ, Flyway, Liquibase\\
-\textbf{Delivery:} Jenkins, Ansible, Docker, Grafana, Splunk, Bitbucket, APIGEE, Testcontainers\\
-\textbf{Applied AI:} OCR, NLP, retrieval, and LLM workflows inside fintech platforms\\
-\textbf{Also:} TypeScript, Angular, JUnit, Mockito, ScalaTest, ScalaCheck
+\section*{Skills}
+\sk{Languages}{Java (8, 24), Scala, Python, SQL, TypeScript; functional, declarative, and object-oriented programming}
+\sk{Backend}{Spring Boot, Hibernate, Akka, Akka HTTP, Cats, fs2, Circe, Play; multithreading, virtual threads, fibers, performance tuning}
+\sk{Architecture}{system design, microservices, event-driven architectures, sharding, partitioning, resilient high-throughput services}
+\sk{Data and messaging}{Oracle, MySQL, PostgreSQL, MS SQL Server, Sybase, Elasticsearch, Flyway, Liquibase; messaging systems: Kafka, AMPS, MQ}
+\textbf{Observability:} Grafana, Splunk; metrics, monitoring, and observability. \textbf{Security:} OAuth2\par
+\textbf{CI/CD:} Git (Bitbucket, GitHub), Jenkins, Ansible, Docker, APIGEE, Testcontainers. \textbf{Java version upgrades:} Moderne, OpenRewrite\par
+\sk{Testing, frontend, mobile}{JUnit, Mockito, ScalaTest, ScalaCheck; Angular; Firebase push notifications}
+\sk{Applied AI}{Python, OCR, NLP, RAG, LLMs; Claude Code (AI-assisted development, code review, skills, plugins); MCP servers}
+\sk{Ways of working}{Agile, Scrum, code review, mentoring, technical interviews, stakeholder communication, problem solving}
 
-\section{Education}
-\textbf{University of Texas at Austin, McCombs School of Business} \hfill 2024 -- 2025\\
-Post Graduate Program in Artificial Intelligence and Machine Learning\\[2pt]
-\textbf{Saboo Siddik College of Engineering, Mumbai} \hfill 2008 -- 2012\\
-B.E.\ Electronics and Telecommunications \quad University topper, 2012\\[2pt]
-\textbf{Bombay Stock Exchange Institute} \hfill 2014 -- 2015\\
-Executive Programme in Investment Management / Finance (EPIM)
+\section*{Projects}
+\textbf{Ziyarat} (\href{https://ziyarat.co.in}{ziyarat.co.in}): Hajj and Umrah package comparison by price per day, hotel stars, and distance from the Haram (partial listings).\par
 
-\section{Certifications and awards}
-Scala Language, Akka for Scala, Akka Streams, Akka Cluster Fundamentals, Akka Cluster Sharding --- Lightbend, Professional Level 2.\\
-Silver Award, Bank of America (2018). Star Award, Cognizant (2017).
+\section*{Education}
+Post Graduate Program in Artificial Intelligence and Machine Learning, University of Texas at Austin (McCombs) | 2024 -- 2025\par
+B.E. Electronics and Telecommunications, Saboo Siddik College of Engineering (University topper, 2012) | 2008 -- 2012\par
+Executive Programme in Investment Management / Finance (EPIM), Bombay Stock Exchange Institute | 2014 -- 2015\par
+
+\section*{Certifications and Awards}
+Lightbend Professional Level 2: Scala Language, Akka for Scala, Akka Streams, Akka Cluster Fundamentals, Akka Cluster Sharding. Silver Award, Bank of America (2018); Star Award, Cognizant (2017); Agile L1, Fire in the Belly, Spot Recognition, Mastek (2014).
 
 \end{document}
